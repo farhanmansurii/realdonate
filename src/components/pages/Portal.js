@@ -1,81 +1,163 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import { withAuth } from '@okta/okta-react';
-import { Jumbotron, Container } from 'react-bootstrap';
-import './style.css';
+import styled, { createGlobalStyle, ThemeProvider } from 'styled-components';
 
-export default withAuth(
-  class Portal extends Component {
-    state = { authenticated: null };
+const Theme = {
+  fontPrimary: "'Poppins', sans-serif",
+  fontSecondary: "'Playfair Display', serif",
+  primary: '#C9A86A',
+  secondary: '#8A7968',
+  accent: '#D64C31',
+  background: '#0F1419',
+  surface: '#1E2328',
+  text: '#F2F2F2',
+  textDark: '#A0A0A0',
+};
 
-    constructor(props) {
-      super(props);
-      this.state = { authenticated: null };
-      this.checkAuthentication = this.checkAuthentication.bind(this);
-      this.login = this.login.bind(this);
-      this.logout = this.logout.bind(this);
+const GlobalStyle = createGlobalStyle`
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Playfair+Display:wght@400;700&display=swap');
+
+  body {
+    background-color: ${props => props.theme.background};
+    color: ${props => props.theme.text};
+    font-family: ${props => props.theme.fontPrimary};
+  }
+`;
+
+const Jumbotron = styled.div`
+  background-color: ${props => props.theme.surface};
+  padding: 250px 2rem;
+  margin-top: ;
+  margin-bottom: 2rem;
+  border-radius: 0.3rem;
+`;
+
+const Container = styled.div`
+  width: 100%;
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  max-width: 1140px;
+`;
+
+const Title = styled.h1`
+  font-family: ${props => props.theme.fontSecondary};
+  color: ${props => props.theme.primary};
+  font-size: 3.5rem;
+  margin-bottom: 1rem;
+`;
+
+const Lead = styled.p`
+  font-size: 1.25rem;
+  font-weight: 300;
+  margin-bottom: 1rem;
+`;
+
+const Button = styled.button`
+  background-color: ${props => props.theme.accent};
+  color: ${props => props.theme.text};
+  border: none;
+  padding: 0.5rem 1rem;
+  font-size: 1.25rem;
+  line-height: 1.5;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+
+  &:hover {
+    background-color: ${props => props.theme.secondary};
+  }
+`;
+
+const StyledLink = styled(Link)`
+  color: ${props => props.theme.primary};
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+const ExternalLink = styled.a`
+  color: ${props => props.theme.primary};
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+`;
+
+class Portal extends Component {
+  state = { authenticated: null };
+
+  constructor(props) {
+    super(props);
+    this.checkAuthentication = this.checkAuthentication.bind(this);
+    this.login = this.login.bind(this);
+    this.logout = this.logout.bind(this);
+  }
+
+  checkAuthentication = async () => {
+    const authenticated = await this.props.auth.isAuthenticated();
+    if (authenticated !== this.state.authenticated) {
+      this.setState({ authenticated });
     }
+  };
 
-    checkAuthentication = async () => {
-      const authenticated = await this.props.auth.isAuthenticated();
-      if (authenticated !== this.state.authenticated) {
-        this.setState({ authenticated });
-      }
-    };
+  async componentDidMount() {
+    this.checkAuthentication();
+  }
 
-    async componentDidMount() {
-      this.checkAuthentication();
-    }
+  async componentDidUpdate() {
+    this.checkAuthentication();
+  }
 
-    async componentDidUpdate() {
-      this.checkAuthentication();
-    }
+  login = async () => {
+    this.props.auth.login('/portal');
+  };
 
-    login = async () => {
-      this.props.auth.login('/portal');
-    };
+  logout = async () => {
+    this.props.auth.logout('/portal');
+  };
 
-    logout = async () => {
-      this.props.auth.logout('/portal');
-    };
+  render() {
+    if (this.state.authenticated === null) return null;
 
-    render() {
-      if (this.state.authenticated === null) return null;
+    const mainContent = this.state.authenticated ? (
+      <div>
+        <Lead>
+          You have entered the member portal,{' '}
+          <StyledLink to="/staff">click here</StyledLink>
+        </Lead>
+        <Button onClick={this.logout}>Logout</Button>
+      </div>
+    ) : (
+      <div>
+        <Lead>
+          To create a new User Account please{' '}
+          <ExternalLink href="https://trial-8930175.okta.com/signin/register" target="_blank">
+            click here! (Create new account)
+          </ExternalLink>
+        </Lead>
+        <Lead>If you are an active member please login.</Lead>
+        <Button onClick={this.login}>Login</Button>
+      </div>
+    );
 
-      const mainContent = this.state.authenticated ? (
-        <div>
-          <p className="lead">
-            You have entered the member portal,{' '}
-            <Link to="/staff">click here</Link>
-          </p>
-          <button className="btn btn-success btn-lg" onClick={this.logout}>
-            Logout
-          </button>
-        </div>
-      ) : (
-          <div>
-            <p className="lead">
-              To create a new User Account please <a href="https://trial-8930175.okta.com/signin/register" target="_blank"> click here! (Create new account) </a>
-            </p>
-            <p className="lead">If you are an active member please login.</p>
-            <button className="btn btn-success btn-lg" onClick={this.login}>
-              Login
-          </button>
-          </div>
-        );
-
-      return (
-
-
-        <Jumbotron fluid>
-          <Container fluid>
-            <h1>Donation</h1>
-            <p>
-              {mainContent}
-            </p>
+    return (
+      <ThemeProvider theme={Theme}>
+        <GlobalStyle />
+        <Jumbotron>
+          <Container>
+            <Title>Donation</Title>
+            {mainContent}
           </Container>
         </Jumbotron>
-      );
-    }
+      </ThemeProvider>
+    );
   }
-);
+}
+
+export default withAuth(Portal);
