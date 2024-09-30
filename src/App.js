@@ -19,6 +19,7 @@ import DonateForm from './components/pages/DonateForm';
 import Donate from './components/pages/Donate';
 import CreateCampaign from './components/pages/CreateCampaign';
 
+
 import "./App.css";
 import SearchNews from "./components/pages/News";
 
@@ -39,7 +40,6 @@ class App extends Component {
           onAuthRequired={onAuthRequired}
         >
           <div className="App">
-            <Hero />
             <Navbar3 />
             <Layout>
               <div>
@@ -72,4 +72,3 @@ class App extends Component {
 }
 
 export default App;
-

@@ -1,160 +1,188 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import "./navbar3.css";
 import { NavDropdown } from 'react-bootstrap';
+import styled from 'styled-components';
 
+const Theme = {
+  fontPrimary: "'Poppins', sans-serif",
+  fontSecondary: "'Playfair Display', serif",
+  primary: '#C9A86A', // Muted gold
+  secondary: '#8A7968', // Warm taupe
+  accent: '#D64C31', // Deep coral
+  background: '#0F1419', // Rich dark blue-gray
+  surface: '#1E2328', // Slightly lighter blue-gray
+  text: '#F2F2F2', // Off-white
+  textDark: '#A0A0A0', // Medium gray
+};
 
+const NavbarContainer = styled.nav`
+  background-color: ${Theme.surface};
+  padding: 15px 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50px;
+  z-index: 1000;
+  width: 95%;
+  max-width: 1200px;
+`;
 
-class Navbar3 extends Component {
-    state = {
-        open: false,
-        width: window.innerWidth
-    };
+const NavContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
 
-    updateWidth = () => {
-        const newState = { width: window.innerWidth };
+const Logo = styled(Link)`
+  color: ${Theme.primary};
+  font-size: 24px;
+  font-weight: bold;
+  text-decoration: none;
+  padding-left:3px;
+  font-family: ${Theme.fontSecondary};
+`;
 
-        if (this.state.open && newState.width > 991) {
-            newState.open = false;
-        }
+const MenuButton = styled.button`
+  display: none;
+  background: none;
+  border: none;
+  color: ${Theme.primary};
+  font-size: 24px;
+  cursor: pointer;
 
-        this.setState(newState);
-    };
+  @media (max-width: 991px) {
+    display: block;
+  }
+`;
 
-    toggleNav = () => {
-        this.setState({ open: !this.state.open });
-    };
+const MenuItems = styled.div`
+  display: flex;
+  align-items: center;
 
-    componentDidMount() {
-        window.addEventListener("resize", this.updateWidth);
+  @media (max-width: 991px) {
+    display: ${props => (props.isOpen ? 'flex' : 'none')};
+    flex-direction: column;
+    align-items: flex-start;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: ${Theme.surface};
+    padding: 20px;
+    border-radius: 0 0 20px 20px;
+  }
+`;
+
+const NavLink = styled(Link)`
+  color: ${Theme.text};
+  text-decoration: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  font-weight: 500;
+  transition: color 0.3s;
+  font-family: ${Theme.fontPrimary};
+
+  &:hover {
+    color: ${Theme.primary};
+  }
+`;
+
+const StyledNavDropdown = styled(NavDropdown)`
+  .dropdown-toggle {
+    color: ${Theme.text} !important;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 500;
+    transition: color 0.3s;
+    font-family: ${Theme.fontPrimary};
+
+    &:hover {
+      color: ${Theme.primary} !important;
     }
+  }
 
-    componentWillUnmount() {
-        window.removeEventListener("resize", this.updateWidth);
+  .dropdown-menu {
+    background-color: ${Theme.surface};
+    border: none;
+    border-radius: 10px;
+    padding: 10px 0;
+  }
+
+  .dropdown-item {
+    color: ${Theme.text};
+    font-family: ${Theme.fontPrimary};
+    transition: background-color 0.3s, color 0.3s;
+
+    &:hover {
+      background-color: ${Theme.primary};
+      color: ${Theme.background};
     }
+  }
+`;
 
-    render() {
-        return (
-            <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-2">
-                <Link className="navbar-brand" to="/" style={{ fontWeight: "700" }}>
-                    DONATION
-        </Link>
-                <button
-                    onClick={this.toggleNav}
-                    className="navbar-toggler"
-                    data-toggle="collapse"
-                    data-target="#navbarNav"
-                    aria-controls="navbarNav"
-                    aria-expanded="false"
-                    aria-label="Toggle navigation"
-                >
-                    <span className="navbar-toggler-icon" />
-                </button>
-                <div className={`${this.state.open ? "" : "collapse "}navbar-collapse`} id="navbarNav">
-                    <ul className="navbar-nav">
-                        <li className="nav-item">
-                            <Link
-                                onClick={this.toggleNav}
-                                className={window.location.pathname === "/" ? "nav-link active" : "nav-link"}
-                                to="/"
-                            >
-                                Home
-              </Link>
-                        </li>
+const ContactButton = styled(Link)`
+  background-color: ${Theme.primary};
+  color: ${Theme.background};
+  padding: 10px 20px;
+  border-radius: 25px;
+  font-weight: bold;
+  text-decoration: none;
+  transition: background-color 0.3s, color 0.3s;
+  font-family: ${Theme.fontPrimary};
 
-                        <li className="nav-item">
-                            <Link
-                                onClick={this.toggleNav}
-                                className={window.location.pathname === "/saved" ? "nav-link active" : "nav-link"}
-                                to="/createCampaign"
-                            >
-                                Create Campaign
-              </Link>
-                        </li>
+  &:hover {
+    background-color: ${Theme.accent};
+    color: ${Theme.text};
+  }
+`;
 
-                        <li className="nav-item">
-                            <Link
-                                onClick={this.toggleNav}
-                                className={window.location.pathname === "/saved" ? "nav-link active" : "nav-link"}
-                                to="/donateform"
-                            >
-                                Donate
-              </Link>
-                        </li>
-                        <li className="nav-item">
-                            <Link
-                                onClick={this.toggleNav}
-                                className={window.location.pathname === "/saved" ? "nav-link active" : "nav-link"}
-                                to="/News"
-                            >
-                                News
-              </Link>
-                        </li>
+const Navbar = () => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [width, setWidth] = useState(window.innerWidth);
 
-                        <li class="nav-item dropdown">
-                            <NavDropdown title="Charity Search" id="basic-nav-dropdown">
-                                <NavDropdown.Item to="/Map"><Link
-                                    onClick={this.toggleNav}
-                                    className={window.location.pathname === "/saved" ? "nav-link active" : "nav-link"}
-                                    to="/Map"
-                                    style={{ color: "black" }}
-                                >By Map</Link></NavDropdown.Item>
-                                <NavDropdown.Item to="/Search"><Link
-                                    onClick={this.toggleNav}
-                                    className={window.location.pathname === "/saved" ? "nav-link active" : "nav-link"}
-                                    to="/Search"
-                                    style={{ color: "black" }}
-                                >By Name</Link></NavDropdown.Item>
-                            </NavDropdown>
-                        </li>
-
-                        <li class="nav-item dropdown">
-                            <NavDropdown title="Sign-In" id="basic-nav-dropdown">
-                                <NavDropdown.Item to="/portal"><Link
-                                    onClick={this.toggleNav}
-                                    className={window.location.pathname === "/saved" ? "nav-link active" : "nav-link"}
-                                    to="/portal"
-                                    style={{ color: "black" }}
-                                >Sign-up</Link></NavDropdown.Item>
-                                <NavDropdown.Item to="/staff"><Link
-                                    onClick={this.toggleNav}
-                                    className={window.location.pathname === "/saved" ? "nav-link active" : "nav-link"}
-                                    to="/staff"
-                                    style={{ color: "black" }}
-                                >Members</Link></NavDropdown.Item>
-                                <NavDropdown.Item to="/staff"><Link
-                                    onClick={this.toggleNav}
-                                    className={window.location.pathname === "/saved" ? "nav-link active" : "nav-link"}
-                                    to="/staff"
-                                    style={{ color: "black" }}
-                                >Portal</Link></NavDropdown.Item>
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item to="/portal"><Link
-                                    onClick={this.toggleNav}
-                                    className={window.location.pathname === "/saved" ? "nav-link active" : "nav-link"}
-                                    to="/portal"
-                                    style={{ color: "black" }}
-                                >Logout</Link></NavDropdown.Item>
-
-                            </NavDropdown>
-                        </li>
-
-
-                        <li className="nav-item">
-                            <Link
-                                onClick={this.toggleNav}
-                                className={window.location.pathname === "/saved" ? "nav-link active" : "nav-link"}
-                                to="/contact"
-                            >
-                                Contact Us
-              </Link>
-                        </li>
-
-                    </ul>
-                </div>
-            </nav>
-        );
+  const updateWidth = () => {
+    const newWidth = window.innerWidth;
+    setWidth(newWidth);
+    if (isOpen && newWidth > 991) {
+      setIsOpen(false);
     }
-}
+  };
 
-export default Navbar3;
+  useEffect(() => {
+    window.addEventListener("resize", updateWidth);
+    return () => window.removeEventListener("resize", updateWidth);
+  }, []);
+
+  const toggleNav = () => setIsOpen(!isOpen);
+
+  return (
+    <NavbarContainer>
+      <NavContent>
+        <Logo to="/">DONATION</Logo>
+        <MenuButton onClick={toggleNav}>☰</MenuButton>
+        <MenuItems isOpen={isOpen}>
+          <NavLink to="/">Home</NavLink>
+          <NavLink to="/createCampaign">Start a Fundraiser</NavLink>
+          <NavLink to="/donateform">Donate</NavLink>
+          <NavLink to="/News">News</NavLink>
+          <StyledNavDropdown title="Charity Search" id="charity-nav-dropdown">
+            <NavDropdown.Item as={Link} to="/Map">By Map</NavDropdown.Item>
+            <NavDropdown.Item as={Link} to="/Search">By Name</NavDropdown.Item>
+          </StyledNavDropdown>
+          <StyledNavDropdown title="Account" id="account-nav-dropdown">
+            <NavDropdown.Item as={Link} to="/portal">Sign Up</NavDropdown.Item>
+            <NavDropdown.Item as={Link} to="/staff">Members</NavDropdown.Item>
+            <NavDropdown.Item as={Link} to="/staff">Portal</NavDropdown.Item>
+            <NavDropdown.Divider />
+            <NavDropdown.Item as={Link} to="/portal">Logout</NavDropdown.Item>
+          </StyledNavDropdown>
+          <ContactButton to="/contact">Contact Us</ContactButton>
+        </MenuItems>
+      </NavContent>
+    </NavbarContainer>
+  );
+};
+
+export default Navbar;

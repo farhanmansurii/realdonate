@@ -15,9 +15,10 @@
     "aos": "^2.3.4",
     "axios": "^0.19.2",
     "bootstrap": "^4.4.1",
-    "formik": "^2.1.4",
     "cors": "^2.8.5",
     "express": "^4.20.0",
+    "formik": "^2.1.4",
+    "gsap": "^3.12.5",
     "mongoose": "^5.9.13",
     "react": "^16.13.1",
     "react-bootstrap": "^1.0.1",
@@ -27,6 +28,7 @@
     "react-scroll": "^1.7.16",
     "reactstrap": "^8.4.1",
     "styled-components": "^5.1.0",
+    "three": "^0.169.0",
     "yup": "^0.28.5"
   },
   "scripts": {
